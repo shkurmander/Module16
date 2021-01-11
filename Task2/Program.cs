@@ -14,15 +14,43 @@ namespace Task2
         {
             return new FileInfo(patch).Length;
         }
+        /// <summary>
+        /// Рекурсивный метод подсчета размера файлов в папке, включая подпапки
+        /// </summary>
+        /// <param name="patch"></param>
+        /// <returns></returns>
         public static long GetTotalSize(string patch)
         {
             long totalSize = 0;
-
-            var files = new DirectoryInfo(patch).GetFiles();
-            foreach ( var file in files)
+            //Сначала подсчитываем размер файлов в корневой папке
+            try
             {
-                totalSize += GetFileSize(file.FullName);
+                var files = new DirectoryInfo(patch).GetFiles();
+                foreach (var file in files)
+                {
+                    totalSize += GetFileSize(file.FullName);
+                }
             }
+            catch (Exception ex)
+            {
+
+                Console.WriteLine(ex.Message);
+            }
+            //Дальше идем по подпапкам
+            try
+            {
+                var dirs = new DirectoryInfo(patch).GetDirectories();
+                foreach (var dir in dirs)
+                {
+                    totalSize += GetTotalSize(dir.FullName);
+                }
+            }
+             catch (Exception ex)
+            {
+
+                Console.WriteLine(ex.Message);
+            }                     
+            
 
             return totalSize;
         }
@@ -79,12 +107,11 @@ namespace Task2
                 //вывод содержимого папки совмещенный с проверкой существования папки 
                 if (ShowDirInfo(patch))
                 {
-                    Console.Write("Для удаления всех файлов и папок наберите y:");
-                    if (Console.ReadKey().Key == ConsoleKey.Y)
-                    {
-                        Console.WriteLine();                        
-                    }
-                    Console.WriteLine();
+                    Console.WriteLine("_________________________\n");
+                    var totalSize = GetTotalSize(patch);
+                    Console.WriteLine($"Общий размер файлов: \n{totalSize} Байт" );
+                    Console.WriteLine($"{(totalSize/Math.Pow(1024,1)):f2} КБайт");
+                    Console.WriteLine($"{(totalSize / Math.Pow(1024,2)):f2} МБайт");
                 }
                 Console.WriteLine("Для выхода нажмите ESC, для продолжения - любую клавишу");
 
