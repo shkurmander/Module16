@@ -127,13 +127,16 @@ namespace Task3
         /// </summary>
         /// <param name="patch"></param>
         /// <returns></returns>
-        public static long GetTotalSize(string patch)
+        public static long GetTotalSize(string patch, ref long cnt)
         {
             long totalSize = 0;
+            
+            
             //Сначала подсчитываем размер файлов в корневой папке
             try
             {
                 var files = new DirectoryInfo(patch).GetFiles();
+                cnt += files.Length;
                 foreach (var file in files)
                 {
                     totalSize += GetFileSize(file.FullName);
@@ -150,7 +153,7 @@ namespace Task3
                 var dirs = new DirectoryInfo(patch).GetDirectories();
                 foreach (var dir in dirs)
                 {
-                    totalSize += GetTotalSize(dir.FullName);
+                    totalSize += GetTotalSize(dir.FullName, ref cnt);
                 }
             }
             catch (Exception ex)
@@ -189,28 +192,40 @@ namespace Task3
                 //вывод содержимого папки совмещенный с проверкой существования папки 
                 if (ShowDirInfo(patch))
                 {
-                    totalSize = GetTotalSize(patch);
+                    //инициализируем счетчик файлов cnt и вычисляем вес папки и кол-во файлов
+                    long cnt = 0;
+                    totalSize = GetTotalSize(patch, ref cnt);
                     Console.WriteLine($"Общий размер файлов: \n{totalSize} Байт");
                     Console.WriteLine($"{(totalSize / Math.Pow(1024, 1)):f2} КБайт");
                     Console.WriteLine($"{(totalSize / Math.Pow(1024, 2)):f2} МБайт");
+                    Console.WriteLine($"Всего: {cnt} файлов");
                     Console.WriteLine("_________________________\n");
 
-                    Console.Write("Для удаления всех файлов и папок наберите y:");
+                    Console.Write("Для удаления всех файлов и папок наберите y:");                    
                     if (Console.ReadKey().Key == ConsoleKey.Y)
                     {
+                        //чистим папку и выводим содержимое
                         Console.WriteLine();
                         DeleteAll(patch);
                         Console.WriteLine("_________________________\n");
                         ShowDirInfo(patch);
+                        Console.WriteLine("_________________________\n");
 
-                        var totalSize2 = GetTotalSize(patch);
+                        //инициализируем счетчик файлов cnt и вычисляем вес папки и кол-во файлов после очистки
+                        long cnt2 = 0;
+                        var totalSize2 = GetTotalSize(patch, ref cnt2);
                         Console.WriteLine($"Общий размер файлов: \n{totalSize2} Байт");
                         Console.WriteLine($"{(totalSize2 / Math.Pow(1024, 1)):f2} КБайт");
                         Console.WriteLine($"{(totalSize2 / Math.Pow(1024, 2)):f2} МБайт");
+                        
+                        Console.WriteLine();
+                        
                         var empty = totalSize - totalSize2;
                         Console.WriteLine($"Освобождено:\n {empty} Байт");
                         Console.WriteLine($"{(empty / Math.Pow(1024, 1)):f2} КБайт");
                         Console.WriteLine($"{(empty / Math.Pow(1024, 2)):f2} МБайт");
+                        Console.WriteLine($"Удалено: {cnt-cnt2} файлов");
+                        Console.WriteLine("_________________________\n");
 
                     }
                     Console.WriteLine();
