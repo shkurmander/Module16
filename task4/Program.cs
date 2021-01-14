@@ -23,23 +23,36 @@ namespace task4
     }
     class Program
     {
-        public static void ReadFile(string patch)
+        public static void ReadFile(string path)
         {
-            
+            // объект для сериализации
+            var student = new Student("Петров", "ПИМ-21", DateTime.Now.AddYears(-18));
+            Console.WriteLine("Объект создан");
+
             BinaryFormatter formatter = new BinaryFormatter();
-            using (var fs = new FileStream(patch, FileMode.Open))
+
+            // получаем поток, куда будем записывать сериализованный объект
+            using (var fs = new FileStream("students.dat", FileMode.OpenOrCreate))
+            {
+                formatter.Serialize(fs, student);
+                Console.WriteLine("Объект сериализован");
+            }
+
+            //using (var fs = new FileStream(path, FileMode.Open))
+            using (var fs = new FileStream("students.dat", FileMode.Open))
             {
                 var newStudent = (Student)formatter.Deserialize(fs);
-
+                Console.WriteLine($"Из файла\nСтудент: {newStudent.Name}\t{newStudent.Group}\t{newStudent.DateOfBirth}");
             }
-            
 
-        }            
 
-        
+
+        }
+
+
         static void Main(string[] args)
         {
-            string patch = @"c:\test\students.dat";
+            string path = @"c:\test\students.dat";
             //string patch = "";
             
 
@@ -55,11 +68,11 @@ namespace task4
 
                 //} while (patch.length < 1);
 
-                if (File.Exists(patch))
+                if (File.Exists(path))
                 {
                                         
                     Console.WriteLine("_________________________\n");
-                    ReadFile(patch);
+                    ReadFile(path);
 
                 }
                 else Console.WriteLine("Ошибка - файл не найден!");
