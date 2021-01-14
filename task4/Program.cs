@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Text;
 
 namespace task4
 {
@@ -10,30 +12,31 @@ namespace task4
     {
         public string Name { get; set; }
         public string Group { get; set; }
-        public DateTime BirthDate { get; set; }
+        public DateTime DateOfBirth { get; set; }
 
-        public Student(string name, string group, DateTime bdate)
+        public Student(string name, string group, DateTime dateofbirth)
         {
             Name = name;
             Group = group;
-            BirthDate = bdate;
+            DateOfBirth = dateofbirth;
         }
     }
     class Program
     {
         public static void ReadFile(string patch)
         {
-            string name;
-            string group;
-            DateTime BirthDate;
+            
             BinaryFormatter formatter = new BinaryFormatter();
-            using (var fs = new FileStream(patch, FileMode.OpenOrCreate))
+            using (var fs = new FileStream(patch, FileMode.Open))
             {
-                var newStudent = (Student)formatter.Deserialize(fs);              
+                var newStudent = (Student)formatter.Deserialize(fs);
 
             }
+            
 
-        }
+        }            
+
+        
         static void Main(string[] args)
         {
             string patch = @"c:\test\students.dat";
